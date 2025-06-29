@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
+import ProviderWrapper from "../provider-wrapper";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -24,7 +25,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en'>
-      <body className={`${inter.variable} antialiased`}>{children}</body>
+      <body
+        suppressHydrationWarning
+        className={`${inter.variable} antialiased`}
+      >
+        <ProviderWrapper>{children}</ProviderWrapper>
+      </body>
     </html>
   );
 }
