@@ -1,48 +1,64 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+:root {
+  --primary-color: #e9e0d2;
+  --secondary-color: #1f4e43;
+  --timer-color: #eaa09c;
+  --scramble-color: #d44729;
+  --nav-bar-color: #e9e0d2;
+  --nav-bar-inactive: #408e7b;
+  --footer-color: #e9e0d2;
+  --footer-color-inactive: #408e7b;
+
+  --primary-background-color: #173f35;
+  --accent-color: #91170c;
+
+  --destructive: oklch(0.396 0.141 25.723);
+  --destructive-foreground: oklch(0.637 0.237 25.331);
+
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --border: oklch(0.269 0 0);
+  --radius: 0.625rem;
+}
+
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-primary: var(--primary-color);
+  --color-secondary: var(--secondary-color);
+  --timer-color: var(--timer-color);
+  --scramble-color: var(--scramble-color);
+  --color-nav-bar: var(--nav-bar-color);
+  --color-nav-bar-inactive: var(--nav-bar-inactive);
+  --color-footer: var(--footer-color);
+  --color-footer-inactive: var(--footer-color-inactive);
 
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
+  --color-primary-background: var(--primary-background-color);
+  /* --color-secondary-background: var(--secondary-background-color); */
+
+  --color-accent-color: var(--accent-color);
+
+  /* --color-accent-foreground: var(--accent-foreground); */
+  /* --color-secondary-foreground: var(--secondary-foreground); */
+  /* --color-primary-foreground: var(--primary-foreground); */
+
+  /* --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground); */
   --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  /* --color-border-foreground: var(--border-foreground); */
 
-  /* --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono); */
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-}
-
-:root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-
-  --radius: 0.625rem;
+  /* --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono); */
 }
 
 @layer base {
   body {
-    @apply bg-background text-foreground;
+    @apply bg-primary-background text-primary;
   }
 }
