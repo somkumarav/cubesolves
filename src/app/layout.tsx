@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Outfit } from "next/font/google";
+import { NavBar } from "@/components/nav-bar";
+import { Footer } from "@/components/site-footer";
 import "./globals.css";
 import ProviderWrapper from "../provider-wrapper";
 
@@ -29,7 +31,11 @@ export default function RootLayout({
         suppressHydrationWarning
         className={`${inter.variable} antialiased`}
       >
-        <ProviderWrapper>{children}</ProviderWrapper>
+        <ProviderWrapper>
+          <main className='container min-h-[90vh]'>{children}</main>
+          <NavBar />
+          <Footer />
+        </ProviderWrapper>
       </body>
     </html>
   );
