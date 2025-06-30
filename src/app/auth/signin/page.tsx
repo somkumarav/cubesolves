@@ -1,19 +1,21 @@
-import { auth, signIn } from "@/auth";
+import { BsGoogle } from "react-icons/bs";
+import { signIn } from "@/auth";
+import { Button } from "@/components/ui/button";
 
 export default async function SignIn() {
-  const session = await auth();
-  console.log("session", session);
-
   return (
     <form
       action={async () => {
         "use server";
         await signIn("google");
       }}
-      className='bg-skin-base min-h-screen'
+      className='mx-auto space-y-2 flex flex-col items-center justify-center min-h-screen w-[20rem]'
     >
-      <p>{session?.user?.email}</p>
-      <button>Sign in with google</button>
+      <p className='w-full text-xl'>Login</p>
+      <Button size='lg' className='w-full'>
+        sign in with google
+        <BsGoogle />
+      </Button>
     </form>
   );
 }
