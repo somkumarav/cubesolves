@@ -4,12 +4,9 @@
 :root {
   --primary-color: #e9e0d2;
   --secondary-color: #1f4e43;
+
   --timer-color: #eaa09c;
   --scramble-color: #d44729;
-  --nav-bar-color: #e9e0d2;
-  --nav-bar-inactive: #408e7b;
-  --footer-color: #e9e0d2;
-  --footer-color-inactive: #408e7b;
 
   --primary-background-color: #173f35;
   --accent-color: #91170c;
@@ -21,6 +18,15 @@
   --muted-foreground: oklch(0.708 0 0);
   --border: oklch(0.269 0 0);
   --radius: 0.625rem;
+
+  --nav-bar-color: #e9e0d2;
+  --nav-bar-inactive: #408e7b;
+  --footer-color: #e9e0d2;
+  --footer-color-inactive: #408e7b;
+  --button-background: #1f4e43;
+  --button-background-hover: #d8cfc2;
+  --button-text: #e9e0d2;
+  --button-text-hover: #1f4e43;
 }
 
 @theme inline {
@@ -55,9 +61,17 @@
   --radius-xl: calc(var(--radius) + 4px);
   /* --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono); */
+
+  --color-button: var(--button-background);
+  --color-button-hover: var(--button-background-hover);
+  --color-button-text: var(--button-text);
+  --color-button-text-hover: var(--button-text-hover);
 }
 
 @layer base {
+  * {
+    @apply duration-300;
+  }
   body {
     @apply bg-primary-background text-primary;
   }
