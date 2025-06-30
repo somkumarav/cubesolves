@@ -1,18 +1,13 @@
 import type { Metadata } from "next";
-import { Inter, Outfit } from "next/font/google";
+import { Roboto_Mono } from "next/font/google";
 import { NavBar } from "@/components/nav-bar";
 import { Footer } from "@/components/site-footer";
 import "./globals.css";
 import ProviderWrapper from "../provider-wrapper";
 
-const outfit = Outfit({
+const robotoMono = Roboto_Mono({
   subsets: ["latin"],
-  variable: "--font-sans",
-});
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-sans",
+  weight: ["100", "200", "300", "400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -29,10 +24,10 @@ export default function RootLayout({
     <html lang='en'>
       <body
         suppressHydrationWarning
-        className={`${inter.variable} antialiased`}
+        className={`${robotoMono.className} antialiased`}
       >
         <ProviderWrapper>
-          <main className='container min-h-[90vh]'>{children}</main>
+          <main className='container  mx-auto min-h-[90vh]'>{children}</main>
           <NavBar />
           <Footer />
         </ProviderWrapper>
