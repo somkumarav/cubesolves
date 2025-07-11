@@ -3,7 +3,7 @@
 
 :root {
   --primary-color: #e9e0d2;
-  --secondary-color: #1f4e43;
+  --secondary-color: #408e7b;
 
   --timer-color: #eaa09c;
   --scramble-color: #d44729;
@@ -23,10 +23,11 @@
   --nav-bar-inactive: #408e7b;
   --footer-color: #e9e0d2;
   --footer-color-inactive: #408e7b;
-  --button-background: #1f4e43;
-  --button-background-hover: #d8cfc2;
-  --button-text: #e9e0d2;
-  --button-text-hover: #1f4e43;
+
+  --component-background: #1f4e43;
+  --component-background-sub: #d8cfc2;
+  --component-font: #e9e0d2;
+  --component-font-sub: #408e7b;
 }
 
 @theme inline {
@@ -62,10 +63,10 @@
   /* --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono); */
 
-  --color-button: var(--button-background);
-  --color-button-hover: var(--button-background-hover);
-  --color-button-text: var(--button-text);
-  --color-button-text-hover: var(--button-text-hover);
+  --color-component: var(--component-background);
+  --color-component-sub: var(--component-background-sub);
+  --color-component-font: var(--component-font);
+  --color-component-font-sub: var(--component-font-sub);
 }
 
 @layer base {
