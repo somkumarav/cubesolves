@@ -45,7 +45,7 @@ export const CredentialSignUpForm = () => {
             placeholder='password'
           />
           <Button disabled={form.formState.isSubmitting} className='w-full'>
-            sing in
+            sing up
           </Button>
         </div>
       )}
