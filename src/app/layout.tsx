@@ -28,7 +28,7 @@ export default function RootLayout({
         className={`${robotoMono.className} antialiased`}
       >
         <ProviderWrapper>
-          <main className='container  mx-auto min-h-[90vh]'>{children}</main>
+          <main className='container mx-auto min-h-[90vh]'>{children}</main>
           <NavBar />
           <Footer />
         </ProviderWrapper>
