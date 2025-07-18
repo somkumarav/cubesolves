@@ -9,6 +9,11 @@ import {
   signUpSchema,
   SignUpSchema,
 } from "@/schemas/auth";
+import { withServerActionAsyncCatcher } from "../lib/async-catcher";
+import { ServerActionReturnType } from "@/lib/api.types";
+import { ErrorHandler } from "../lib/errors";
+import { SuccessResponse } from "../lib/success";
+import { zodSafeParser } from "../lib/zod-valildator";
 
 export const Login = async (values: LogInSchema) => {
   const validatedFields = logInSchema.safeParse(values);
@@ -39,32 +44,32 @@ export const Login = async (values: LogInSchema) => {
   return { msg: "Login successful" };
 };
 
-export const SignUp = async (values: SignUpSchema) => {
-  const validatedFields = signUpSchema.safeParse(values);
-
-  if (!validatedFields.success) {
-    console.error(validatedFields);
-    return { msg: "invalid fields", data: validatedFields.error };
-  }
-  const formData = validatedFields.data;
+export const SignUp = withServerActionAsyncCatcher<
+  SignUpSchema,
+  ServerActionReturnType
+>(async (values: SignUpSchema) => {
+  const formData = zodSafeParser(values, signUpSchema);
 
   const userAlreadyExists = await db.user.findUnique({
     where: { email: formData.email },
   });
 
   if (userAlreadyExists) {
-    return { msg: "User already exists" };
+    throw new ErrorHandler("User already exists", "AUTHENTICATION_FAILED");
   }
 
   const hashedPassword = await bcrypt.hash(formData.password, 10);
-  const dbUser = await db.user.create({
+  const user = await db.user.create({
     data: {
       email: formData.email,
       name: formData.name,
       password: hashedPassword,
     },
   });
-  const { password, ...restOfUser } = dbUser;
 
-  return { msg: "Sign up successful", data: { ...restOfUser } };
-};
+  return new SuccessResponse(
+    "User created successfully",
+    200,
+    user
+  ).serialize();
+});
