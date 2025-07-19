@@ -19,6 +19,18 @@ export const {
     },
   },
   callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider !== "credentials") return true;
+
+      const existingUser = await db.user.findUnique({
+        where: { id: user.id },
+      });
+
+      // Prevent sign-in if the user has not verified their email
+      if (!existingUser?.emailVerified) return false;
+
+      return true;
+    },
     async session({ session, token }) {
       if (token.sub && session.user) {
         session.user.id = token.sub;

@@ -9,24 +9,52 @@ import {
   signUpSchema,
   SignUpSchema,
 } from "@/schemas/auth";
-import { withServerActionAsyncCatcher } from "../lib/async-catcher";
+import { withServerActionAsyncCatcher } from "@/lib/async-catcher";
 import { ServerActionReturnType } from "@/lib/api.types";
-import { ErrorHandler } from "../lib/errors";
-import { SuccessResponse } from "../lib/success";
-import { zodSafeParser } from "../lib/zod-valildator";
+import { ErrorHandler } from "@/lib/errors";
+import { SuccessResponse } from "@/lib/success";
+import { zodSafeParser } from "@/lib/zod-validator";
+import {
+  generateVerificationToken,
+  getVerificationTokenByEmail,
+  getVerificationTokenByToken,
+} from "@/lib/verification";
+import { sendMail } from "@/lib/sendMail";
+import { generateVerificationEmail } from "@/mails/verification-email";
 
 export const Login = async (values: LogInSchema) => {
-  const validatedFields = logInSchema.safeParse(values);
+  const validatedFields = zodSafeParser(values, logInSchema);
 
-  if (!validatedFields.success) {
-    console.error(validatedFields);
-    return { msg: "invalid fields", data: validatedFields.error };
+  const existingUser = await db.user.findUnique({
+    where: { email: validatedFields.email },
+  });
+
+  if (!existingUser || !existingUser.email || !existingUser.password) {
+    return { error: "Invalid credentials" };
+  }
+  const passwordMatch = await bcrypt.compare(
+    validatedFields.password,
+    existingUser.password
+  );
+  if (!passwordMatch) {
+    return { error: "Invalid credentials" };
+  }
+
+  if (!existingUser.emailVerified) {
+    console.log("Sending confirmation email to:", existingUser.email);
+    const token = await generateVerificationToken(existingUser.email);
+    await sendMail({
+      to: existingUser.email,
+      subject: "Email Confirmation",
+      html: generateVerificationEmail(token.token),
+    });
+    return { success: "Confirmation email sent" };
   }
 
   try {
     await signIn("credentials", {
-      email: validatedFields.data.email,
-      password: validatedFields.data.password,
+      email: validatedFields.email,
+      password: validatedFields.password,
       redirectTo: "/",
     });
   } catch (error) {
@@ -67,9 +95,45 @@ export const SignUp = withServerActionAsyncCatcher<
     },
   });
 
-  return new SuccessResponse(
-    "User created successfully",
-    200,
-    user
-  ).serialize();
+  const verificationToken = getVerificationTokenByEmail(formData.email);
+
+  return new SuccessResponse("Confirmation email sent", 200).serialize();
+});
+
+export const VerifyEmail = withServerActionAsyncCatcher<
+  { token: string },
+  ServerActionReturnType
+>(async ({ token }) => {
+  if (!token) {
+    throw new ErrorHandler("Token is required", "VALIDATION_ERROR");
+  }
+
+  const existingToken = await getVerificationTokenByToken(token);
+  if (!existingToken) {
+    throw new ErrorHandler("Invalid token", "AUTHENTICATION_FAILED");
+  }
+
+  const hasExpired = new Date(existingToken.expiresAt) < new Date();
+  if (hasExpired) {
+    throw new ErrorHandler("Token has expired", "AUTHENTICATION_FAILED");
+  }
+
+  const existingUser = await db.user.findUnique({
+    where: { email: existingToken.email },
+  });
+
+  if (!existingUser) {
+    throw new ErrorHandler("User not found", "AUTHENTICATION_FAILED");
+  }
+
+  await db.user.update({
+    where: { id: existingUser.id },
+    data: { emailVerified: new Date(), email: existingToken.email },
+  });
+
+  await db.verificationToken.delete({
+    where: { id: existingToken.id },
+  });
+
+  return new SuccessResponse("Email verified", 200).serialize();
 });
