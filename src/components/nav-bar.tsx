@@ -49,8 +49,8 @@ export const NavBar = () => {
 
     session?.user?.image
       ? {
-          name: "User",
-          link: "/user",
+          name: "Profile",
+          link: "/profile",
           icon: (
             <Image
               src={session.user.image}
@@ -62,8 +62,8 @@ export const NavBar = () => {
           ),
         }
       : {
-          name: "User",
-          link: "/user",
+          name: "Profile",
+          link: "/profile",
           icon: <FaUserCircle size={20} />,
         },
   ];
