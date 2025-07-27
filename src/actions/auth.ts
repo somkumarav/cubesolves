@@ -87,7 +87,7 @@ export const SignUp = withServerActionAsyncCatcher<
   }
 
   const hashedPassword = await bcrypt.hash(formData.password, 10);
-  const user = await db.user.create({
+  await db.user.create({
     data: {
       email: formData.email,
       name: formData.name,
@@ -95,7 +95,7 @@ export const SignUp = withServerActionAsyncCatcher<
     },
   });
 
-  const verificationToken = getVerificationTokenByEmail(formData.email);
+  await getVerificationTokenByEmail(formData.email);
 
   return new SuccessResponse("Confirmation email sent", 200).serialize();
 });
