@@ -24,6 +24,12 @@ export const sendMail = async ({
   html?: string;
 }) => {
   try {
+    if (!process.env.EMAIL_HOST || !process.env.EMAIL_ID) {
+      console.error("Email environment variables are missing.");
+      throw new Error("Email service is currently unavailable.");
+    }
+    await transporter.verify();
+
     const info = await transporter.sendMail({
       from: `"cubesolves" <${process.env.EMAIL_ID}>`,
       to: to,
