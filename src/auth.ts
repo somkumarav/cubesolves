@@ -22,16 +22,16 @@ export const {
           },
         });
 
-        const settings = await tx.userSettings.create({
+        await tx.userSetting.create({
           data: {
-            solveSessionId: session.id,
+            currentSolveSessionId: session.id,
+            userId: user.id!,
           },
         });
 
         const updatedUser = await tx.user.update({
           where: { id: user.id },
           data: {
-            userSettingsId: settings.id,
             emailVerified: new Date(),
           },
           include: {

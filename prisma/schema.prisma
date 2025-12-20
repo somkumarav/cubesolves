@@ -20,17 +20,16 @@ enum PenaltyType {
 }
 
 model User {
-  id             String         @id @default(cuid())
-  name           String?
-  email          String?        @unique
-  emailVerified  DateTime?      @map("email_verified")
-  image          String?
-  password       String?
-  accounts       Account[]
-  solves         Solve[]
-  solveSessions  SolveSession[]
-  userSettings   UserSettings?  @relation(fields: [userSettingsId], references: [id])
-  userSettingsId String?        @unique
+  id            String         @id @default(cuid())
+  name          String?
+  email         String?        @unique
+  emailVerified DateTime?      @map("email_verified")
+  image         String?
+  password      String?
+  accounts      Account[]
+  solves        Solve[]
+  solveSessions SolveSession[]
+  userSettings  UserSetting?
 
   @@map("users")
 }
@@ -63,28 +62,28 @@ model VerificationToken {
   @@unique([email, token])
 }
 
-model UserSettings {
-  id             String        @id @default(cuid())
-  solveSessionId String?       @unique
-  currentSession SolveSession? @relation(fields: [solveSessionId], references: [id], onDelete: SetNull)
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  user           User?
+model UserSetting {
+  id                    String   @id @default(cuid())
+  currentSolveSessionId String?
+  userId                String   @unique
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 
+  @@index([currentSolveSessionId])
   @@map("user_settings")
 }
 
 model SolveSession {
-  id           String        @id @default(cuid())
-  name         String?
-  cube         CubeType
-  userId       String
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  solves       Solve[]
-  deletedAt    DateTime?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  userSettings UserSettings?
+  id        String    @id @default(cuid())
+  name      String?
+  userId    String
+  cube      CubeType
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  solves    Solve[]
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   @@index([userId, createdAt])
   @@index([userId, deletedAt])
@@ -92,22 +91,22 @@ model SolveSession {
 }
 
 model Solve {
-  id        Int           @id @default(autoincrement())
-  scramble  String
-  cube      CubeType
-  rawTime   Int
-  time      Int
-  penalty   PenaltyType   @default(NONE)
-  note      String?
-  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String
-  sessionId String?
-  deletedAt DateTime?
-  session   SolveSession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
+  id             Int           @id @default(autoincrement())
+  scramble       String
+  cube           CubeType
+  rawTime        Int
+  time           Int
+  penalty        PenaltyType   @default(NONE)
+  note           String?
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String
+  solveSessionId String?
+  deletedAt      DateTime?
+  solveSession   SolveSession? @relation(fields: [solveSessionId], references: [id], onDelete: SetNull)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 
-  @@index([sessionId])
+  @@index([solveSessionId])
   @@index([userId, deletedAt, createdAt])
   @@index([userId, cube, deletedAt])
   @@index([createdAt])

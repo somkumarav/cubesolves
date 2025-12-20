@@ -148,16 +148,16 @@ export const VerifyEmail = withServerActionAsyncCatcher<
       },
     });
 
-    const settings = await tx.userSettings.create({
+    await tx.userSetting.create({
       data: {
-        solveSessionId: session.id,
+        currentSolveSessionId: session.id,
+        userId: existingUser.id,
       },
     });
 
     const updatedUser = await tx.user.update({
       where: { id: existingUser.id },
       data: {
-        userSettingsId: settings.id,
         emailVerified: new Date(),
       },
       include: {
