@@ -7,14 +7,30 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum CubeType {
+  CUBE_22
+  CUBE_33
+  CUBE_44
+}
+
+enum PenaltyType {
+  NONE
+  PLUS_TWO
+  DNF
+}
+
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime? @map("email_verified")
-  image         String?
-  password      String?
-  accounts      Account[]
+  id             String         @id @default(cuid())
+  name           String?
+  email          String?        @unique
+  emailVerified  DateTime?      @map("email_verified")
+  image          String?
+  password       String?
+  accounts       Account[]
+  solves         Solve[]
+  solveSessions  SolveSession[]
+  userSettings   UserSettings?  @relation(fields: [userSettingsId], references: [id])
+  userSettingsId String?        @unique
 
   @@map("users")
 }
@@ -32,8 +48,7 @@ model Account {
   scope             String?
   id_token          String? @db.Text
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
   @@map("accounts")
@@ -46,4 +61,54 @@ model VerificationToken {
   expiresAt DateTime
 
   @@unique([email, token])
+}
+
+model UserSettings {
+  id             String        @id @default(cuid())
+  solveSessionId String?       @unique
+  currentSession SolveSession? @relation(fields: [solveSessionId], references: [id], onDelete: SetNull)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  user           User?
+
+  @@map("user_settings")
+}
+
+model SolveSession {
+  id           String        @id @default(cuid())
+  name         String?
+  cube         CubeType
+  userId       String
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  solves       Solve[]
+  deletedAt    DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  userSettings UserSettings?
+
+  @@index([userId, createdAt])
+  @@index([userId, deletedAt])
+  @@map("sessions")
+}
+
+model Solve {
+  id        Int           @id @default(autoincrement())
+  scramble  String
+  cube      CubeType
+  rawTime   Int
+  time      Int
+  penalty   PenaltyType   @default(NONE)
+  note      String?
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  sessionId String?
+  deletedAt DateTime?
+  session   SolveSession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([sessionId])
+  @@index([userId, deletedAt, createdAt])
+  @@index([userId, cube, deletedAt])
+  @@index([createdAt])
 }

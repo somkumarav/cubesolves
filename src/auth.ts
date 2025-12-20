@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import authConfig from "@/auth.config";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { db } from "@/lib/prisma";
+import { CubeType } from "@prisma/client";
 
 export const {
   handlers: { GET, POST },
@@ -12,9 +13,34 @@ export const {
   pages: { signIn: "/auth/signin", error: "/auth/error" },
   events: {
     async linkAccount({ user }) {
-      await db.user.update({
-        where: { id: user.id },
-        data: { emailVerified: new Date() },
+      await db.$transaction(async (tx) => {
+        const session = await tx.solveSession.create({
+          data: {
+            name: "1",
+            cube: CubeType.CUBE_33,
+            userId: user.id!,
+          },
+        });
+
+        const settings = await tx.userSettings.create({
+          data: {
+            solveSessionId: session.id,
+          },
+        });
+
+        const updatedUser = await tx.user.update({
+          where: { id: user.id },
+          data: {
+            userSettingsId: settings.id,
+            emailVerified: new Date(),
+          },
+          include: {
+            userSettings: true,
+            solveSessions: true,
+          },
+        });
+
+        return updatedUser;
       });
     },
   },

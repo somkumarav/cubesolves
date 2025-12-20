@@ -16,11 +16,11 @@ import { SuccessResponse } from "@/lib/success";
 import { zodSafeParser } from "@/lib/zod-validator";
 import {
   generateVerificationToken,
-  getVerificationTokenByEmail,
   getVerificationTokenByToken,
 } from "@/lib/verification";
 import { sendMail } from "@/lib/sendMail";
 import { generateVerificationEmail } from "@/mails/verification-email";
+import { CubeType } from "@prisma/client";
 
 export const Login = async (values: LogInSchema) => {
   const validatedFields = zodSafeParser(values, logInSchema);
@@ -41,7 +41,6 @@ export const Login = async (values: LogInSchema) => {
   }
 
   if (!existingUser.emailVerified) {
-    console.log("Sending confirmation email to:", existingUser.email);
     const token = await generateVerificationToken(existingUser.email);
     await sendMail({
       to: existingUser.email,
@@ -95,7 +94,12 @@ export const SignUp = withServerActionAsyncCatcher<
     },
   });
 
-  await getVerificationTokenByEmail(formData.email);
+  const token = await generateVerificationToken(formData.email);
+  await sendMail({
+    to: formData.email,
+    subject: "Email Confirmation",
+    html: generateVerificationEmail(token.token),
+  });
 
   return new SuccessResponse("Confirmation email sent", 200).serialize();
 });
@@ -133,6 +137,36 @@ export const VerifyEmail = withServerActionAsyncCatcher<
 
   await db.verificationToken.delete({
     where: { id: existingToken.id },
+  });
+
+  await db.$transaction(async (tx) => {
+    const session = await tx.solveSession.create({
+      data: {
+        name: "1",
+        cube: CubeType.CUBE_33,
+        userId: existingUser.id!,
+      },
+    });
+
+    const settings = await tx.userSettings.create({
+      data: {
+        solveSessionId: session.id,
+      },
+    });
+
+    const updatedUser = await tx.user.update({
+      where: { id: existingUser.id },
+      data: {
+        userSettingsId: settings.id,
+        emailVerified: new Date(),
+      },
+      include: {
+        userSettings: true,
+        solveSessions: true,
+      },
+    });
+
+    return updatedUser;
   });
 
   return new SuccessResponse("Email verified", 200).serialize();
