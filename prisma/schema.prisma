@@ -63,14 +63,14 @@ model VerificationToken {
 }
 
 model UserSetting {
-  id                    String   @id @default(cuid())
-  currentSolveSessionId String?
-  userId                String   @unique
-  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  id                   String   @id @default(cuid())
+  latestSolveSessionId String
+  userId               String   @unique
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 
-  @@index([currentSolveSessionId])
+  @@index([latestSolveSessionId])
   @@map("user_settings")
 }
 
