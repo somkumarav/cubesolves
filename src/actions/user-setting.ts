@@ -1,10 +1,10 @@
 "use server";
 import { UserSetting } from "@prisma/client";
-import { ServerActionReturnType } from "@/lib/api.types";
+import { ServerActionReturnType } from "@/lib/HOC/api.types";
 import { db } from "@/lib/prisma";
-import { withSession } from "@/lib/session";
-import { SuccessResponse } from "@/lib/success";
-import { ErrorHandler } from "@/lib/errors";
+import { SuccessResponse } from "@/lib/HOC/success";
+import { ErrorHandler } from "@/lib/HOC/errors";
+import { withSession } from "@/lib/HOC/session";
 
 export const getUserSetting = withSession<
   void,
