@@ -9,10 +9,10 @@ import {
   signUpSchema,
   SignUpSchema,
 } from "@/schemas/auth";
-import { withServerActionAsyncCatcher } from "@/lib/async-catcher";
-import { ServerActionReturnType } from "@/lib/api.types";
-import { ErrorHandler } from "@/lib/errors";
-import { SuccessResponse } from "@/lib/success";
+import { withServerActionAsyncCatcher } from "@/lib/HOC/async-catcher";
+import { ServerActionReturnType } from "@/lib/HOC/api.types";
+import { ErrorHandler } from "@/lib/HOC/errors";
+import { SuccessResponse } from "@/lib/HOC/success";
 import { zodSafeParser } from "@/lib/zod-validator";
 import {
   generateVerificationToken,
@@ -150,7 +150,7 @@ export const VerifyEmail = withServerActionAsyncCatcher<
 
     await tx.userSetting.create({
       data: {
-        currentSolveSessionId: session.id,
+        latestSolveSessionId: session.id,
         userId: existingUser.id,
       },
     });

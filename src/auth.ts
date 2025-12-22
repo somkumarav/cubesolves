@@ -24,7 +24,7 @@ export const {
 
         await tx.userSetting.create({
           data: {
-            currentSolveSessionId: session.id,
+            latestSolveSessionId: session.id,
             userId: user.id!,
           },
         });
