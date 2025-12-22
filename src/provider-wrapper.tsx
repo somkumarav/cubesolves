@@ -1,7 +1,7 @@
 import { SessionProvider } from "next-auth/react";
 import { ReactNode } from "react";
 import { auth } from "@/auth";
-import { SolveProvider } from "@/context/solve-context";
+import ReactQueryClientProvider from "./react-query-wrapper";
 
 export default async function ProviderWrapper({
   children,
@@ -11,7 +11,7 @@ export default async function ProviderWrapper({
   const session = await auth();
   return (
     <SessionProvider session={session}>
-      <SolveProvider>{children}</SolveProvider>
+      <ReactQueryClientProvider>{children}</ReactQueryClientProvider>
     </SessionProvider>
   );
 }

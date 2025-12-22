@@ -1,25 +1,34 @@
-"use client";
-import { useSolveContext } from "@/context/solve-context";
+import { auth } from "@/auth";
+import { initializeUserSettings } from "@/actions/home";
+import HomePageView from "./home-page-view";
 
-export default function Home() {
-  const { time, scramble } = useSolveContext();
+export default async function Home() {
+  const session = await auth();
+
+  if (!session?.user) {
+    return <div>local page</div>;
+  }
+
+  const initialUserSettings = await initializeUserSettings();
+  if (
+    !initialUserSettings.status ||
+    !initialUserSettings.additional?.cube ||
+    !initialUserSettings.additional.latestSolveSessionId
+  ) {
+    return (
+      <div className='h-[90vh] flex flex-col items-center justify-center'>
+        <p className='text-xl text-destructive-light'>Something went wrong!</p>
+        <p className='text-sm'>
+          Please try login in back. If error persists contact support.
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <div className='flex flex-col items-center justify-between min-h-[90vh]'>
-      <div className='flex h-[20vh] justify-center pt-5'>
-        <h2
-          className='text-2xl tracking-wider text-center animate-fade'
-          suppressHydrationWarning
-        >
-          {scramble}
-        </h2>
-      </div>
-      <div className='flex items-center justify-center '>
-        <h2 className='text-6xl font-robotoMono font-semibold tracking-wider'>
-          {time}
-        </h2>
-      </div>
-      <div></div>
-    </div>
+    <HomePageView
+      cubeType={initialUserSettings.additional?.cube}
+      solveSessionId={initialUserSettings.additional?.latestSolveSessionId}
+    />
   );
 }
