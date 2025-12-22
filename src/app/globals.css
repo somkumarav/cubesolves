@@ -13,6 +13,7 @@
 
   --destructive: #c21f1f;
   --destructive-foreground: oklch(0.637 0.237 25.331);
+  --destructive-light: #db4646;
 
   --muted: oklch(0.269 0 0);
   --muted-foreground: oklch(0.708 0 0);
@@ -50,7 +51,9 @@
   /* --color-primary-foreground: var(--primary-foreground); */
 
   --color-destructive: var(--destructive);
-  /* --color-destructive-foreground: var(--destructive-foreground); */
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive-light: var(--destructive-light);
+
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-border: var(--border);
