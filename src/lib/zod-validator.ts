@@ -1,5 +1,5 @@
 import Zod, { ZodObject, ZodRawShape } from "zod";
-import { ErrorHandler } from "./errors";
+import { ErrorHandler } from "./HOC/errors";
 
 export function zodSafeParser<F extends ZodRawShape>(
   values: unknown,

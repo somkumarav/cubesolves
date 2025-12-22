@@ -1,7 +1,7 @@
 import { Session } from "next-auth";
 import { auth } from "@/auth";
-import { withServerActionAsyncCatcher } from "@/lib/async-catcher";
-import { ErrorHandler } from "@/lib/errors";
+import { withServerActionAsyncCatcher } from "@/lib/HOC/async-catcher";
+import { ErrorHandler } from "@/lib/HOC/errors";
 
 type withSessionType<T, R> = (session: Session, args: T) => Promise<R>;
 

@@ -1,4 +1,4 @@
-import { standardizeApiError } from "@/lib/errors";
+import { standardizeApiError } from "@/lib/HOC/errors";
 
 type withServerActionAsyncCatcherType<T, R> = (args: T) => Promise<R>;
 
