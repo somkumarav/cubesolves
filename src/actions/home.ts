@@ -4,9 +4,14 @@ import { withSession } from "@/lib/HOC/session";
 import { ServerActionReturnType } from "@/lib/HOC/api.types";
 import { SuccessResponse } from "@/lib/HOC/success";
 
+type initializeUserSettingsReturnType = {
+  userSettings: UserSetting;
+  solveSession: SolveSession;
+};
+
 export const initializeUserSettings = withSession<
   void,
-  ServerActionReturnType<UserSetting & SolveSession>
+  ServerActionReturnType<initializeUserSettingsReturnType>
 >(async (session) => {
   const userSettings = await db.userSetting.findFirst({
     where: { userId: session?.user?.id },
@@ -36,7 +41,7 @@ export const initializeUserSettings = withSession<
           solveSessions: true,
         },
       });
-      return { ...txSolveSession, ...txUserSetting };
+      return { userSettings: txUserSetting, solveSession: txSolveSession! };
     });
     return new SuccessResponse("Success", 200, res).serialize();
   }
@@ -46,7 +51,7 @@ export const initializeUserSettings = withSession<
     },
   });
   return new SuccessResponse("Success", 200, {
-    ...(solveSession as SolveSession),
-    ...(userSettings as UserSetting),
+    userSettings: userSettings,
+    solveSession: solveSession!,
   }).serialize();
 });

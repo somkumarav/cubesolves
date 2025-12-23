@@ -1,5 +1,5 @@
 "use server";
-import { SolveSession } from "@prisma/client";
+import { Solve, SolveSession } from "@prisma/client";
 import { ServerActionReturnType } from "@/lib/HOC/api.types";
 import { withSession } from "@/lib/HOC/session";
 import { SuccessResponse } from "@/lib/HOC/success";
@@ -63,5 +63,37 @@ export const getSolveSession = withSession<
     "Solve session found",
     200,
     solveSession
+  ).serialize();
+});
+
+export const getLastFiveSolve = withSession<
+  GetSolveSession,
+  ServerActionReturnType<Solve[]>
+>(async (session, data) => {
+  const validatedData = zodSafeParser(data, getSolveSessionSchema);
+
+  const solveSession = await db.solveSession.findFirst({
+    where: {
+      id: validatedData.solveSessionId,
+      userId: session.user?.id,
+    },
+    include: {
+      solves: {
+        take: 5,
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
+    },
+  });
+
+  if (!solveSession) {
+    throw new ErrorHandler("Solve session not found", "NOT_FOUND");
+  }
+
+  return new SuccessResponse(
+    "Solve session found",
+    200,
+    solveSession.solves
   ).serialize();
 });

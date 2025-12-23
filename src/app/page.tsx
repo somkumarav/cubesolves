@@ -12,8 +12,8 @@ export default async function Home() {
   const initialUserSettings = await initializeUserSettings();
   if (
     !initialUserSettings.status ||
-    !initialUserSettings.additional?.cube ||
-    !initialUserSettings.additional.latestSolveSessionId
+    !initialUserSettings.additional?.userSettings ||
+    !initialUserSettings.additional.solveSession
   ) {
     return (
       <div className='h-[90vh] flex flex-col items-center justify-center'>
@@ -25,10 +25,5 @@ export default async function Home() {
     );
   }
 
-  return (
-    <HomePageView
-      cubeType={initialUserSettings.additional?.cube}
-      solveSessionId={initialUserSettings.additional?.latestSolveSessionId}
-    />
-  );
+  return <HomePageView {...initialUserSettings.additional.solveSession} />;
 }

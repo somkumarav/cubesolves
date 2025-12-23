@@ -9,4 +9,9 @@ export const addSolveSchema = z.object({
   note: z.string().max(500).optional(),
   solveSessionId: z.string().optional(),
 });
-export type addSolveSchema = z.infer<typeof addSolveSchema>;
+export type AddSolve = z.infer<typeof addSolveSchema>;
+
+export const plusTwoSchema = z.object({
+  id: z.number(),
+});
+export type PlusTwo = z.infer<typeof plusTwoSchema>;
