@@ -7,6 +7,7 @@ import { SolveSession } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import { FaRedoAlt, FaTimes } from "react-icons/fa";
 import { LastFiveSolveShowCase } from "../components/last-five-solve-showcase";
+import { formatTime } from "@/lib/format-time";
 
 export default function HomePageView(solveSession: SolveSession) {
   const {
@@ -95,7 +96,7 @@ export default function HomePageView(solveSession: SolveSession) {
       </div>
       <div className='flex flex-col items-center justify-center '>
         <h2 className={`text-6xl font-robotoMono font-semibold tracking-wider`}>
-          {(displayTime / 1000).toFixed(2)}
+          {formatTime(displayTime)}
         </h2>
         <div className='pt-8 space-x-4'>
           <Button

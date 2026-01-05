@@ -1,4 +1,5 @@
 import { Solve } from "@prisma/client";
+import { formatTime } from "@/lib/format-time";
 
 export const LastFiveSolveShowCase = ({
   lastFiveSolves,
@@ -12,7 +13,7 @@ export const LastFiveSolveShowCase = ({
       {lastFiveSolves?.map((solve) => {
         return (
           <p className='font-medium' key={solve.id}>
-            {(solve.time / 1000).toFixed(2)}
+            {formatTime(solve.time)}
           </p>
         );
       })}
