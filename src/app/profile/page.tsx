@@ -1,13 +1,22 @@
-"use client";
-import { useSession, signOut } from "next-auth/react";
-import { Button } from "@/components/ui/button";
+import { SolveTable } from "@/components/profile/solve-table/data-table";
+import { columns } from "@/components/profile/solve-table/columns";
+import {
+  getAllSolveSession,
+  getSolveSessionSolves,
+} from "@/actions/solve-session";
 
-export default function ProfilePage() {
-  const session = useSession();
+export default async function ProfilePage() {
+  const solveSession = await getAllSolveSession();
+  if (!solveSession.status || !solveSession.additional) return null;
+  const data = await getSolveSessionSolves({
+    solveSessionId: solveSession.additional[0].id,
+  });
+
+  if (!data.status || !data.additional) return null;
+
   return (
-    <div>
-      <p>{JSON.stringify(session.data?.user)}</p>
-      <Button onClick={() => signOut()}>signOut</Button>
+    <div className='h-[90vh] overflow-y-scroll'>
+      <SolveTable columns={columns} data={data.additional.solves} />
     </div>
   );
 }

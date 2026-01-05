@@ -7,8 +7,8 @@ import { zodSafeParser } from "@/lib/zod-validator";
 import {
   AddSolveSession,
   addSolveSessionSchema,
-  GetSolveSession,
-  getSolveSessionSchema,
+  GetSolveSessionSolves,
+  getSolveSessionSolvesSchema,
 } from "@/schemas/solve-session";
 import { db } from "@/lib/prisma";
 import { generateDefaultSessionName } from "@/lib/solve-session";
@@ -39,11 +39,32 @@ export const addSolveSession = withSession<
   return new SuccessResponse("Solve added", 200, newSolveSession).serialize();
 });
 
-export const getSolveSession = withSession<
-  GetSolveSession,
-  ServerActionReturnType<SolveSession>
+export const getAllSolveSession = withSession<
+  void,
+  ServerActionReturnType<SolveSession[]>
+>(async (session) => {
+  const solveSession = await db.solveSession.findMany({
+    where: {
+      userId: session.user?.id,
+    },
+  });
+
+  if (!solveSession) {
+    throw new ErrorHandler("Solve session not found", "NOT_FOUND");
+  }
+
+  return new SuccessResponse(
+    "Solve session found",
+    200,
+    solveSession
+  ).serialize();
+});
+
+export const getSolveSessionSolves = withSession<
+  GetSolveSessionSolves,
+  ServerActionReturnType<SolveSession & { solves: Solve[] }>
 >(async (session, data) => {
-  const validatedData = zodSafeParser(data, getSolveSessionSchema);
+  const validatedData = zodSafeParser(data, getSolveSessionSolvesSchema);
 
   const solveSession = await db.solveSession.findFirst({
     where: {
@@ -51,7 +72,11 @@ export const getSolveSession = withSession<
       userId: session.user?.id,
     },
     include: {
-      solves: true,
+      solves: {
+        orderBy: {
+          id: "desc",
+        },
+      },
     },
   });
 
@@ -67,10 +92,10 @@ export const getSolveSession = withSession<
 });
 
 export const getLastFiveSolve = withSession<
-  GetSolveSession,
+  GetSolveSessionSolves,
   ServerActionReturnType<Solve[]>
 >(async (session, data) => {
-  const validatedData = zodSafeParser(data, getSolveSessionSchema);
+  const validatedData = zodSafeParser(data, getSolveSessionSolvesSchema);
 
   const solveSession = await db.solveSession.findFirst({
     where: {

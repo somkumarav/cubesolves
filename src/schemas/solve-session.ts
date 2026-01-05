@@ -7,8 +7,8 @@ export const addSolveSessionSchema = z.object({
 });
 export type AddSolveSession = z.infer<typeof addSolveSessionSchema>;
 
-export const getSolveSessionSchema = z.object({
+export const getSolveSessionSolvesSchema = z.object({
   solveSessionId: z.string(),
 });
 
-export type GetSolveSession = z.infer<typeof getSolveSessionSchema>;
+export type GetSolveSessionSolves = z.infer<typeof getSolveSessionSolvesSchema>;
