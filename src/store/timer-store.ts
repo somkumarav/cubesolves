@@ -42,7 +42,7 @@ export const useTimerStore = create<TimerStore>((set, get) => ({
 
     set({
       scramble: newScramble,
-      lastFiveSolves: solvesArray,
+      lastFiveSolves: solvesArray.reverse(),
     });
   },
 
