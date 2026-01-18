@@ -1,22 +1,35 @@
+"use client";
 import { SolveTable } from "@/components/profile/solve-table/data-table";
 import { columns } from "@/components/profile/solve-table/columns";
-import {
-  getAllSolveSession,
-  getSolveSessionSolves,
-} from "@/actions/solve-session";
+import { useInfiniteSolves } from "@/components/profile/solve-table/useInfiniteSolves";
+import { useMemo } from "react";
 
-export default async function ProfilePage() {
-  const solveSession = await getAllSolveSession();
-  if (!solveSession.status || !solveSession.additional) return null;
-  const data = await getSolveSessionSolves({
-    solveSessionId: solveSession.additional[0].id,
-  });
+export default function ProfilePage() {
+  const { data, isFetching, isLoading, fetchNextPage, hasNextPage, isError, error} =
+    useInfiniteSolves({
+      cursor: null,
+      solveSessionId: null,
+    });
 
-  if (!data.status || !data.additional) return null;
+    if(isError && error){
+      console.error(error)
+    }
+
+  const flatData = useMemo(
+    () => data?.pages?.flatMap((page) => page.items ?? []) ?? [],
+    [data?.pages]
+  );
 
   return (
     <div className='h-[90vh] overflow-y-scroll'>
-      <SolveTable columns={columns} data={data.additional.solves} />
+      <SolveTable
+        columns={columns}
+        data={flatData}
+        isLoading={isLoading}
+        isFetching={isFetching}
+        fetchNextPage={fetchNextPage}
+        hasNextPage={hasNextPage}
+      />
     </div>
   );
 }

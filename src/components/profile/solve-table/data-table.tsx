@@ -15,15 +15,27 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useEffect, useRef } from "react";
+import { FetchNextPageOptions } from "@tanstack/react-query";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  isFetching?: boolean;
+  isLoading?: boolean;
+  hasNextPage: boolean;
+  fetchNextPage: (
+    options?: FetchNextPageOptions | undefined
+  ) => Promise<unknown>;
 }
 
 export function SolveTable<TData, TValue>({
   columns,
   data,
+  isFetching,
+  isLoading,
+  hasNextPage,
+  fetchNextPage,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -31,8 +43,27 @@ export function SolveTable<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
   });
 
+  const observerTarget = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isFetching) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 1.0 }
+    );
+
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current);
+    }
+
+    return () => observer.disconnect();
+  }, [fetchNextPage, isFetching]);
+
   return (
-    <div className='overflow-hidden rounded-t-md'>
+    <div className='overflow-y-auto rounded-t-md'>
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -53,25 +84,56 @@ export function SolveTable<TData, TValue>({
           ))}
         </TableHeader>
         <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
-          ) : (
+          {isLoading ? (
             <TableRow>
-              <TableCell colSpan={columns.length} className='h-24 text-center'>
-                No results.
+              <TableCell
+                colSpan={columns.length}
+                className='text-center text-component-font-sub'
+              >
+                Loading...
               </TableCell>
             </TableRow>
+          ) : (
+            <>
+              {table.getRowModel().rows?.length ? (
+                <>
+                  {table.getRowModel().rows.map((row) => (
+                    <TableRow key={row.id}>
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+                </>
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className='h-24 text-center'
+                  >
+                    No results.
+                  </TableCell>
+                </TableRow>
+              )}
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  ref={observerTarget}
+                  className='text-center text-component-font-sub'
+                >
+                  {isFetching
+                    ? "Loading more..."
+                    : hasNextPage
+                    ? "Scroll for more"
+                    : "You've reached the end of the list"}
+                </TableCell>
+              </TableRow>
+            </>
           )}
         </TableBody>
       </Table>
